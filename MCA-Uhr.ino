@@ -1,6 +1,6 @@
 // Kombi-Uhr (Uhr, Countdown, Temperatur, Scoreboard)
 // Bauteile
-// 1x ESP8266 WeMos Mini D1
+// 1x ESP8266 WeMos Mini D1  ---  Board WeMos D1 R1
 // 1x DS3231 RTC  
 // 1x Micro USB Breakout board  
 // 1x Micro USB Kabel
@@ -8,6 +8,7 @@
 // 2x WS2812B LED Strip 60 LED's pro Meter
 
 #include <Wire.h>
+// #include <stdint.h>           // lange Zahlen
 #include <RtcDS3231.h>                        // Include RTC library by Makuna: https://github.com/Makuna/Rtc
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
@@ -15,6 +16,7 @@
 #include <FastLED.h>
 #include <LittleFS.h>
 // #include <FS.h>                               // Anleitung auf http://arduino.esp8266.com/Arduino/versions/2.3.0/doc/filesystem.html#uploading-files-to-file-system
+
 #define countof(a) (sizeof(a) / sizeof(a[0]))
 #define chipset ws2812B
 #define NUM_LEDS 214                          // Insgesamt 214 LED's     
@@ -62,7 +64,8 @@ CRGB scoreboardColorLeft = CRGB::Green;       // Anzeige am Scoreboard: links gr
 CRGB scoreboardColorMid = CRGB::Black;        // Anzeige am Scoreboard: mitte aus
 CRGB scoreboardColorRight = CRGB::Red;        // Anzeige am Scoreboard: rechts rot
 CRGB alternateColor = CRGB::Black;            // Wenn nichts angezeigt werden soll
-long numbers[] = {                            // Hier werden die LEDs addressiert 
+// long long numbers[] = {                            // Hier werden die LEDs addressiert 
+uint64_t numbers[] = {                       // Hier werden die LEDs addressiert 
   0b00000111111111111111111111111111111,  // [0] 0
   0b00000111110000000000000000000011111,  // [1] 1
   0b11111111111111100000111111111100000,  // [2] 2
@@ -76,7 +79,7 @@ long numbers[] = {                            // Hier werden die LEDs addressier
   0b00000000000000000000000000000000000,  // [10] alle aus
   0b11111111111111111111000000000000000,  // [11] Grad-Ssymbol
   0b00000000001111111111111111111100000,  // [12] C(elsius)
-  0b11111000001111111111111110000000000,  // [13] F(ahrenheit)
+  0b11111000001111111111111110000000000  // [13] F(ahrenheit)
 };
 
 void setup() {
@@ -112,9 +115,9 @@ void setup() {
   WiFi.setSleepMode(WIFI_NONE_SLEEP);  // WLAN nicht abschalten
 
   delay(200);
-  Serial.setDebugOutput(true); // Fred wenns läuft, wieder auskommentieren
+  Serial.setDebugOutput(true); // Debugging: Wenns läuft, wieder auskommentieren
   
-  // Check if you're LED strip is a RGB or GRB version (third parameter)
+  // Testen, ob der LED Streifen eine RGB oder eine GRB Version ist (third parameter)
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(LEDs, NUM_LEDS);  
   FastLED.setDither(false);
   FastLED.setCorrection(TypicalLEDStrip);
@@ -136,7 +139,7 @@ void setup() {
   byte count = 0;
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    // Stop if cannot connect
+    // Beenden, wenn nicht mit dem WLAN verbunden werden kann
     if (count >= 60) {
       Serial.println("Kann mich nicht mit dem lokalen WLAN verbinden.");      
       return;
@@ -218,7 +221,7 @@ void setup() {
 
   server.on("/hourformat", HTTP_POST, []() {   
     hourFormat = server.arg("hourformat").toInt();
-    clockMode = 0;                                           // Uhrzeit Modus
+    clockMode = 0;                                           // Uhrzeit Format
     server.send(200, "text/json", "{\"result\":\"ok\"}");
   }); 
 
@@ -227,8 +230,8 @@ void setup() {
     server.send(200, "text/json", "{\"result\":\"ok\"}");
   });  
   
-  // Before uploading the files with the "ESP8266 Sketch Data Upload" tool, zip the files with the command "gzip -r ./data/" (on Windows I do this with a Git Bash)
-  // *.gz files are automatically unpacked and served from your ESP (so you don't need to create a handler for each file).
+  // Vor dem Upload der Dateien mit dem "ESP8266 Sketch Data Upload" tool, packe die Dateien mit Ubuntu mit dem Kommando "gzip -r ./data/" (mit Windows geht das ber eine Git Bash)
+  // *.gz werden vom ESP automatisch entpackt (so muss nicht jede einzelne Datei einzeln hochgeladen werden).
   // Fred server.serveStatic("/", SPIFFS, "/", "max-age=86400");
   server.serveStatic("/", LittleFS, "/", "max-age=86400");
   server.begin();     
@@ -296,32 +299,33 @@ void displayNumber(byte number, byte segment, CRGB color) {
     case 0:
       startindex = 0;
       break;
+
     case 1:
       startindex = 35;
-
       break;
+
     case 2:
       startindex = 72;
-
       break;
+
     case 3:
       startindex = 107;
-
       break;
+
     case 4:
       startindex = 144;
-
       break;
+
     case 5:
       startindex = 179;
-
       break;                
   }
 
+//  for (short i=0; i<35; i++){
   for (byte i=0; i<35; i++){
 
     yield();
-    LEDs[i + startindex] = ((numbers[number] & 1 << i) == 1 << i) ? color : alternateColor;
+    LEDs[i + startindex] = ((numbers[number] & 1ULL << i) == 1ULL << i) ? color : alternateColor;
   } 
 }
 
@@ -352,10 +356,10 @@ void updateClock() {
   
   CRGB color = CRGB(r_val, g_val, b_val);
 
-//  if (h1 > 0)
+//  if (h1 > 0)                   // Nullen auf der linken Seite ausblenden
 //    displayNumber(h1,3,color);
 //  else 
-//    displayNumber(10,3,color);  // Blank
+//    displayNumber(10,3,color);  // dunkel
     
 //  displayNumber(h2,2,color);
 //  displayNumber(m1,1,color);
@@ -436,7 +440,7 @@ void updateCountdown() {
 
   if (hours <= 0 && remMinutes <= 0 && remSeconds <= 0) {
     Serial.println("Countdown beendet.");
-    //endCountdown();
+    endCountdown();
     countdownMilliSeconds = 0;
     endCountDownMillis = 0;
     //clockMode = 0;
