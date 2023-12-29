@@ -35,7 +35,7 @@ Auf der Suche nach fertigen Programmbeispielen stieß ich auf den Code von Leon 
 https://github.com/leonvandenbeukel/7-Segment-Digital-Clock-V2
 der die wesentlichen Komponenten schin beinhaltet und zusätzlich noch ein Scoreboard bietet.
 Diesen Code habe ich zum größten Teil übernommen und für meine Zwecke angepasst. 
-Die größte Hürde für mich als Programmier-Anfänger war die Länge der Variablen, die durch die Anzahl der vielen LEDs meiner Anzeige den normalen Rahmen überschriotten hat.
+Die größte Hürde für mich als Programmier-Anfänger war die Länge der Variablen, die durch die Anzahl der vielen LEDs meiner Anzeige den normalen Rahmen überschritten hat.
 
 ---------------------------------------------
 
