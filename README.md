@@ -1,6 +1,15 @@
 # Kombi-Uhr (Uhr, Countdown, Temperatur, Scoreboard) 
 Die Software basiert aud dem Code von https://github.com/leonvandenbeukel/7-Segment-Digital-Clock-V2
 
+-----------------------------------------
+License
+
+Creative Commons License
+This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+http://creativecommons.org/licenses/by-nc-sa/4.0/
+
+----------------------------------------
+
 Benötigte Bauteile:
 * 1x ESP8266 WeMos Mini D1  ---  Board WeMos D1 R1
 * 1x DS3231 RTC  
