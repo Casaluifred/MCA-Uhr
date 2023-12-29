@@ -22,6 +22,7 @@ Benötigte Bauteile:
 *  Plexiglasplatte als Wetterschutz vorne
 *  Scharniere und Schloss
 *  3D-gedruckte Komponenten für die 7-Segmente etc.
+*  Einbaustecker, Kabel, Zubehör ...
 
 -------------------------------------------
 
